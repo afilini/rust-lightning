@@ -687,6 +687,7 @@ impl OutboundPayments {
 	pub(super) fn send_payment_with_route<ES: Deref, NS: Deref, F>(
 		&self, route: &Route, payment_hash: PaymentHash, recipient_onion: RecipientOnionFields,
 		payment_id: PaymentId, entropy_source: &ES, node_signer: &NS, best_block_height: u32,
+		recv_value_msat: Option<u64>,
 		send_payment_along_path: F
 	) -> Result<(), PaymentSendFailure>
 	where
@@ -695,7 +696,7 @@ impl OutboundPayments {
 		F: Fn(SendAlongPathArgs) -> Result<(), APIError>
 	{
 		let onion_session_privs = self.add_new_pending_payment(payment_hash, recipient_onion.clone(), payment_id, None, route, None, None, entropy_source, best_block_height)?;
-		self.pay_route_internal(route, payment_hash, recipient_onion, None, payment_id, None,
+		self.pay_route_internal(route, payment_hash, recipient_onion, None, payment_id, recv_value_msat,
 			onion_session_privs, node_signer, best_block_height, &send_payment_along_path)
 			.map_err(|e| { self.remove_outbound_if_all_failed(payment_id, &e); e })
 	}

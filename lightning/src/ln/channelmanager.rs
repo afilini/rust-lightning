@@ -3502,7 +3502,16 @@ where
 		let _persistence_guard = PersistenceNotifierGuard::notify_on_drop(self);
 		self.pending_outbound_payments
 			.send_payment_with_route(route, payment_hash, recipient_onion, payment_id,
-				&self.entropy_source, &self.node_signer, best_block_height,
+				&self.entropy_source, &self.node_signer, best_block_height, None,
+				|args| self.send_payment_along_path(args))
+	}
+
+	pub fn send_partial_payment_with_route(&self, route: &Route, payment_hash: PaymentHash, recipient_onion: RecipientOnionFields, payment_id: PaymentId, recv_value_msat: Option<u64>) -> Result<(), PaymentSendFailure> {
+		let best_block_height = self.best_block.read().unwrap().height();
+		let _persistence_guard = PersistenceNotifierGuard::notify_on_drop(self);
+		self.pending_outbound_payments
+			.send_payment_with_route(route, payment_hash, recipient_onion, payment_id,
+				&self.entropy_source, &self.node_signer, best_block_height, recv_value_msat,
 				|args| self.send_payment_along_path(args))
 	}
 
