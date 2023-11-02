@@ -4477,19 +4477,19 @@ where
 													purpose: $purpose.clone(), htlcs: Vec::new(), onion_fields: None,
 												}
 											});
-										if $purpose != claimable_payment.purpose {
-											let log_keysend = |keysend| if keysend { "keysend" } else { "non-keysend" };
-											log_trace!(self.logger, "Failing new {} HTLC with payment_hash {} as we already had an existing {} HTLC with the same payment hash", log_keysend(is_keysend), &payment_hash, log_keysend(!is_keysend));
-											fail_htlc!(claimable_htlc, payment_hash);
-										}
+										// if $purpose != claimable_payment.purpose {
+										// 	let log_keysend = |keysend| if keysend { "keysend" } else { "non-keysend" };
+										// 	log_trace!(self.logger, "Failing new {} HTLC with payment_hash {} as we already had an existing {} HTLC with the same payment hash", log_keysend(is_keysend), &payment_hash, log_keysend(!is_keysend));
+										// 	fail_htlc!(claimable_htlc, payment_hash);
+										// }
 										if !self.default_configuration.accept_mpp_keysend && is_keysend && !claimable_payment.htlcs.is_empty() {
 											log_trace!(self.logger, "Failing new keysend HTLC with payment_hash {} as we already had an existing keysend HTLC with the same payment hash and our config states we don't accept MPP keysend", &payment_hash);
 											fail_htlc!(claimable_htlc, payment_hash);
 										}
 										if let Some(earlier_fields) = &mut claimable_payment.onion_fields {
-											if earlier_fields.check_merge(&mut onion_fields).is_err() {
-												fail_htlc!(claimable_htlc, payment_hash);
-											}
+											// if earlier_fields.check_merge(&mut onion_fields).is_err() {
+											// 	fail_htlc!(claimable_htlc, payment_hash);
+											// }
 										} else {
 											claimable_payment.onion_fields = Some(onion_fields);
 										}
@@ -4499,21 +4499,21 @@ where
 										for htlc in htlcs.iter() {
 											total_value += htlc.sender_intended_value;
 											earliest_expiry = cmp::min(earliest_expiry, htlc.cltv_expiry);
-											if htlc.total_msat != claimable_htlc.total_msat {
-												log_trace!(self.logger, "Failing HTLCs with payment_hash {} as the HTLCs had inconsistent total values (eg {} and {})",
-													&payment_hash, claimable_htlc.total_msat, htlc.total_msat);
-												total_value = msgs::MAX_VALUE_MSAT;
-											}
+											// if htlc.total_msat != claimable_htlc.total_msat {
+											// 	log_trace!(self.logger, "Failing HTLCs with payment_hash {} as the HTLCs had inconsistent total values (eg {} and {})",
+											// 		&payment_hash, claimable_htlc.total_msat, htlc.total_msat);
+											// 	total_value = msgs::MAX_VALUE_MSAT;
+											// }
 											if total_value >= msgs::MAX_VALUE_MSAT { break; }
 										}
 										// The condition determining whether an MPP is complete must
 										// match exactly the condition used in `timer_tick_occurred`
 										if total_value >= msgs::MAX_VALUE_MSAT {
 											fail_htlc!(claimable_htlc, payment_hash);
-										} else if total_value - claimable_htlc.sender_intended_value >= claimable_htlc.total_msat {
-											log_trace!(self.logger, "Failing HTLC with payment_hash {} as payment is already claimable",
-												&payment_hash);
-											fail_htlc!(claimable_htlc, payment_hash);
+										// } else if total_value - claimable_htlc.sender_intended_value >= claimable_htlc.total_msat {
+										// 	log_trace!(self.logger, "Failing HTLC with payment_hash {} as payment is already claimable",
+										// 		&payment_hash);
+										// 	fail_htlc!(claimable_htlc, payment_hash);
 										} else if total_value >= claimable_htlc.total_msat {
 											#[allow(unused_assignments)] {
 												committed_to_claimable = true;
@@ -5322,12 +5322,12 @@ where
 		let mut errs = Vec::new();
 		let per_peer_state = self.per_peer_state.read().unwrap();
 		for htlc in sources.iter() {
-			if prev_total_msat.is_some() && prev_total_msat != Some(htlc.total_msat) {
-				log_error!(self.logger, "Somehow ended up with an MPP payment with different expected total amounts - this should not be reachable!");
-				debug_assert!(false);
-				valid_mpp = false;
-				break;
-			}
+			// if prev_total_msat.is_some() && prev_total_msat != Some(htlc.total_msat) {
+			// 	log_error!(self.logger, "Somehow ended up with an MPP payment with different expected total amounts - this should not be reachable!");
+			// 	debug_assert!(false);
+			// 	valid_mpp = false;
+			// 	break;
+			// }
 			prev_total_msat = Some(htlc.total_msat);
 
 			if expected_amt_msat.is_some() && expected_amt_msat != htlc.total_value_received {
